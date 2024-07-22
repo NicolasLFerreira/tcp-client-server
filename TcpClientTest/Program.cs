@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -11,7 +12,7 @@ class Program
         try
         {
             // Create client and stream
-            TcpClient client = new(Configurator.IP, Configurator.Port);
+            TcpClient client = new(Configurator.IPPlain, Configurator.Port);
             NetworkStream stream = client.GetStream();
 
             // Inside loop variables
