@@ -9,36 +9,42 @@ class Program
 {
     static void Main(string[] args)
     {
+        Console.WriteLine("Attempting connection...");
         try
         {
             // Create client and stream
             TcpClient client = new(Configurator.IPPlain, Configurator.Port);
             NetworkStream stream = client.GetStream();
 
+            Console.WriteLine($"Connected!");
+            Console.WriteLine($"IP: {Configurator.IPPlain} / Port: {Configurator.Port}");
+
             // Inside loop variables
             string message = "Hello World!";
-            string responseData;
+            byte[] messageByte;
+            string response;
+            byte[] responseByte;
             int bytes;
-            byte[] data;
+
 
             while (message != string.Empty)
             {
                 // Encode message
                 message = Console.ReadLine() ?? string.Empty;
-                data = Encoding.UTF8.GetBytes(message);
+                messageByte = Encoding.UTF8.GetBytes(message);
 
-                // Send to TcpListener
-                stream.Write(data, 0, data.Length);
+                // Send to TCP listener
+                stream.Write(messageByte, 0, messageByte.Length);
                 Console.WriteLine($"Sent: {message}");
 
-                // Response storage
-                data = new byte[256];
-                responseData = string.Empty;
+                // Response data
+                response = string.Empty;
+                responseByte = new byte[256];
 
                 // Read the first batch of the TcpServer response bytes
-                bytes = stream.Read(data, 0, data.Length);
-                responseData = Encoding.UTF8.GetString(data, 0, bytes);
-                Console.WriteLine($"Received: {responseData}");
+                bytes = stream.Read(responseByte, 0, responseByte.Length);
+                response = Encoding.UTF8.GetString(responseByte, 0, bytes);
+                Console.WriteLine($"Received: {response}");
             }
             // Close everything
             stream.Close();
@@ -46,10 +52,12 @@ class Program
         }
         catch (ArgumentNullException e)
         {
+            Console.WriteLine($"Failed to connect!");
             Console.WriteLine($"ArgumentNullException: {e}");
         }
         catch (SocketException e)
         {
+            Console.WriteLine($"Failed to connect!");
             Console.WriteLine($"SocketException: {e}");
         }
 
