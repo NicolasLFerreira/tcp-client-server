@@ -2,39 +2,42 @@
 using System.Net.Sockets;
 using System.Text;
 
+using NetworkTestfield;
+
 class Program
 {
     static void Main(string[] args)
     {
         try
         {
-            // Connect to a remote device
-            int port = 13000;
-            TcpClient client = new TcpClient("192.168.56.1", port);
-
-            // Get a client stream for reading and writing
+            // Create client and stream
+            TcpClient client = new(Configurator.IP, Configurator.Port);
             NetworkStream stream = client.GetStream();
 
-            while (true)
+            // Inside loop variables
+            string message = "Hello World!";
+            string responseData;
+            int bytes;
+            byte[] data;
+
+            while (message != string.Empty)
             {
-                // Translate the passed message into ASCII and store it as a byte array
-                string message = Console.ReadLine() ?? "Sup";
-                byte[] data = Encoding.UTF8.GetBytes(message);
+                // Encode message
+                message = Console.ReadLine() ?? string.Empty;
+                data = Encoding.UTF8.GetBytes(message);
 
-                // Send the message to the connected TcpServer
+                // Send to TcpListener
                 stream.Write(data, 0, data.Length);
-                Console.WriteLine("Sent: {0}", message);
+                Console.WriteLine($"Sent: {message}");
 
-                // Buffer to store the response bytes
+                // Response storage
                 data = new byte[256];
-
-                // String to store the response ASCII representation
-                string responseData = string.Empty;
+                responseData = string.Empty;
 
                 // Read the first batch of the TcpServer response bytes
-                int bytes = stream.Read(data, 0, data.Length);
+                bytes = stream.Read(data, 0, data.Length);
                 responseData = Encoding.UTF8.GetString(data, 0, bytes);
-                Console.WriteLine("Received: {0}", responseData);
+                Console.WriteLine($"Received: {responseData}");
             }
             // Close everything
             stream.Close();
@@ -42,11 +45,11 @@ class Program
         }
         catch (ArgumentNullException e)
         {
-            Console.WriteLine("ArgumentNullException: {0}", e);
+            Console.WriteLine($"ArgumentNullException: {e}");
         }
         catch (SocketException e)
         {
-            Console.WriteLine("SocketException: {0}", e);
+            Console.WriteLine($"SocketException: {e}");
         }
 
         Console.WriteLine("\nHit enter to continue...");
